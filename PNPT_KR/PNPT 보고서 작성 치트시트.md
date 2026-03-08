@@ -645,4 +645,4 @@ Ligolo-ng       피벗팅 터널
 
 →클로드로 간단하게 제작한 샘플 보고서이다
 
-[PNPT_샘플_보고서.docx](attachment:ada45579-9d7e-4fcf-b003-d6bc4014c3e9:PNPT_샘플_보고서.docx)
+[📄 PNPT 샘플 보고서 다운로드](https://github.com/jaejun835/hacking-notes/raw/main/PNPT_샘플_보고서.docx)
