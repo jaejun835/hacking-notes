@@ -32,4 +32,4 @@ dig txt givemetheflag.com @<MACHINE_IP>
 
 이렇게 실행하면 응답에 포함된 TXT 레코드에서 플래그를 확인할 수 있다
 
-![dig-1.png]([https://github.dev/jaejun835/hacking-notes/blob/main/KR/PortSwigger_API%20testing_KR/Lab%3A%20Exploiting%20an%20API%20endpoint%20using%20documentation.md](https://github.com/jaejun835/hacking-notes/blob/main/Photo/Tryhackme%20challenge_KR/TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png))
+![1]([https://github.dev/jaejun835/hacking-notes/blob/main/KR/PortSwigger_API%20testing_KR/Lab%3A%20Exploiting%20an%20API%20endpoint%20using%20documentation.md](https://github.com/jaejun835/hacking-notes/blob/main/Photo/Tryhackme%20challenge_KR/TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png))
