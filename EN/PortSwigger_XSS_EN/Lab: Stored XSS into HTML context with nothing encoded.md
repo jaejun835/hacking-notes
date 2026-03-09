@@ -18,11 +18,13 @@ Just enter the following into the comment box:
 
 ![1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/PortSwigger_XSS_KR/Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded/1.Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded.png)
 
-When the payload is submitted, the server stores it in the database without encoding. The next time anyone views the page, the browser renders and executes it as JavaScript.
-
 ![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/PortSwigger_XSS_KR/Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded/2.Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded.png)
 
+When the payload is submitted, the server stores it in the database without encoding. The next time anyone views the page, the browser renders and executes it as JavaScript.
+
 ![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/PortSwigger_XSS_KR/Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded/3.Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded.png)
+
+![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/PortSwigger_XSS_KR/Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded/4.Lab%3A%20Stored%20XSS%20into%20HTML%20context%20with%20nothing%20encoded.png)
 
 ### [Vulnerability Explanation]
 
