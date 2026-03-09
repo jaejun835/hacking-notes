@@ -68,7 +68,7 @@ ssh user@<IP> -p 22
 
 로그인 후 현재 위치를 확인하니 /home/ubuntu에 있었고 상위 디렉토리로 이동해서 파일을 탐색했다
 
-![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
+![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.jpg)
 
 ```bash
 pwd
