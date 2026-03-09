@@ -25,6 +25,7 @@ enum4linux 스캔 결과 도메인 이름이 THM-AD 인 것을 알 수 있었다
 여기서 NetBIOS-Domain는 Active Directory의 구조를 파악할 때 매우 큰 역할을 한다
 
 왜냐하면 아래의 결과로 도메인 컨트롤러(최상)를 찾을 수 있기 때문이다
+![1](https://github.com/jaejun835/hacking-notes/blob/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 정답: THM-AD
 
