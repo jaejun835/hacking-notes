@@ -29,3 +29,4 @@ dig txt givemetheflag.com @<MACHINE_IP>
 ```
 
 Run that and the flag shows up right in the TXT record of the response.  
+![1](https://github.com/jaejun835/hacking-notes/blob/main/Photo/Tryhackme%20challenge_KR/TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.TryHackMe%20%7C%20Dig%20Dug%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
