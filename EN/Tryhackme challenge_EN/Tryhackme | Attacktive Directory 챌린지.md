@@ -1,93 +1,86 @@
+TryHackMe link → https://tryhackme.com/room/attacktivedirectory
 
-tryhackme 링크 → https://tryhackme.com/room/attacktivedirectory
-
-오늘은 TryHackMe의 Attacktive Directory 룸을 풀어보았다
+Today I worked through the TryHackMe Attacktive Directory room.
 
 ### [What tool will allow us to enumerate port 139/445?]
 
-139는 보통 NetBIOS, 445는 보통 SMB 서비스를 사용하는데 쓴다
+Port 139 typically runs NetBIOS; port 445 runs SMB. Think of NetBIOS as essentially an older version of the SMB service.
 
-여기서 NetBIOS는 쉽게 말해 SMB 서비스의 과거 버젼이라 생각하면 된다
-
-이 두가지 포트를 열거하기 위해선 enum4linux를 사용하면 된다
+To enumerate both ports, `enum4linux` is the right tool:
 
 ```
 enum4linux -a <IP>
 ```
 
-정답: enum4linux
+**Answer: enum4linux**
 
 ### [What is the NetBIOS-Domain Name of the machine?]
 
-enum4linux 스캔 결과 도메인 이름이 THM-AD 인 것을 알 수 있었다
+The enum4linux scan revealed the domain name as **THM-AD**.
 
-여기서 NetBIOS-Domain는 Active Directory의 구조를 파악할 때 매우 큰 역할을 한다
-
-왜냐하면 아래의 결과로 도메인 컨트롤러(최상)를 찾을 수 있기 때문이다
+The NetBIOS domain name is critical for mapping Active Directory structure — it helps you find the Domain Controller (the top of the hierarchy).
 
 ![1](https://github.com/jaejun835/hacking-notes/blob/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-정답: THM-AD
+**Answer: THM-AD**
 
 ### [What invalid TLD do people commonly use for their Active Directory Domain?]
 
-도메인은 쉽게 말해 한 회사/조직에 속한 모든 컴퓨터와 사람들을 묶어서 관리하는 시스템이다
+A domain is essentially a system that groups and manages all the computers and users within an organization.
 
-흔히 사람들이 Active Directory 도메인에 사용하는 유효하지 않은 TLD는 .local이다
+The most commonly used (and invalid) TLD for internal AD domains is `.local`.
 
-정답: .local
+**Answer: .local**
 
 ### [What command within Kerbrute will allow us to enumerate valid usernames?]
 
-사용자 이름을 열거하기 위해선 kerbrute에 userenum 옵션을 추가해 주면 된다
+To enumerate usernames, use the `userenum` subcommand:
 
 ```
 kerbrute userenum --dc <IP> -d spookysec.local user.txt
 ```
 
-정답: userenum
+**Answer: userenum**
 
 ### [What notable account is discovered? (These should jump out at you)]
 
-kerbrute를 통해 총 16개의 계정을 찾았다
+Kerbrute found 16 results. Since AD is case-insensitive, many are duplicates — there are really only 8 unique valid accounts.
 
-하지만 AD 자체가 대소문자 비구분 시스템이기 때문에 출력 결과를 자세히 보게 되면 중복된 이메일들을 볼 수 있다
-
-결과적으로는 계정 자체는 8개가 유효하며 그 중 svc-admin을 활용하면 다음 단계를 진행 할 수 있다
+Of those, `svc-admin` is the standout account to pursue.
 
 ![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
+**Answer: svc-admin**
+
 ### [What is the other notable account is discovered? (These should jump out at you)]
 
-kerbrute로 찾은 계정들 중 backup 계정 또한 유용하게 사용 가능하다
+Among the accounts, `backup` is also a high-value target.
 
-(백업 작업 특성상 스크립트나 스케줄러로 자동 실행되어야 해서 패스워드가 어딘가에 평문으로 저장되거나 Kerberos 사전인증이 꺼져있거나 아니면 DCSync 권한 같은 강력한 권한을 가지는 경우가 많기 때문..)
+Backup accounts tend to be privileged: they need to run automatically via scripts, so their passwords are often stored in plaintext somewhere, Kerberos pre-authentication may be disabled, or they may hold DCSync-level rights.
+
+**Answer: backup**
 
 ### [We have two user accounts that we could potentially query a ticket from. Which user account can you query a ticket from with no password?]
 
-이 질문은 AS-REP Roasting 공격 기법을 의미한다
-
-AS-REP Roasting은 쉽게 말해 비밀번호 없이 티켓을 받아서 오프라인으로 크래킹하는 공격이 생각하면 된다
+This is about **AS-REP Roasting** — request a ticket without a password, crack it offline.
 
 ```
 impacket-GetNPUsers spookysec.local/ -usersfile user.txt -dc-ip <IP> -format hashcat -request
 ```
+
 ![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/3.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
+Roasting confirmed `svc-admin` as the vulnerable account.
 
-로스팅 결과 svc-admin 가 취약한 계정이였다는 것을 알 수 있다
-
-정답: svc-admin
+**Answer: svc-admin**
 
 ### [What mode is the hash?]
 
-로스팅 결과, 해쉬를 자세히 보면 $krb5asrep$23$이기 때문에 18200 타입일거다
+The hash prefix `$krb5asrep$23$` means hashcat mode 18200.
 
-정답: 18200
+**Answer: 18200**
 
 ### [Now crack the hash with the modified password list provided, what is the user accounts password?]
-
-해쉬캣을 사용하여 크랙해주면 바로 자격증명을 얻을 수 있다
 
 ```
 hashcat -m 18200 ./hash.txt ./password.txt
@@ -95,23 +88,19 @@ hashcat -m 18200 ./hash.txt ./password.txt
 
 ![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/4.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-정답: management2005
+**Answer: management2005**
 
 ### [What utility can we use to map remote SMB shares?]
 
-원격 SMB 공유에 매핑할려면 간단하게 smbclient를 써주면 된다
-
-정답: smbclient
+**Answer: smbclient**
 
 ### [Which option will list shares?]
 
-List의 약자인 -L 옵션을 사용하면 공유폴더 리스트를 볼 수 있다
+The `-L` option (short for List).
 
-정답: -L
+**Answer: -L**
 
 ### [How many remote shares is the server listing?]
-
-smbclient를 사용하여 공유 리스트를 열거 해보면 총 6개의 리스트를 확인 할 수 있다
 
 ```
 smbclient -L //10.48.185.32 -U svc-admin
@@ -119,23 +108,25 @@ smbclient -L //10.48.185.32 -U svc-admin
 
 ![5](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/5.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
+6 shares returned.
+
+**Answer: 6**
+
 ### [There is one particular share that we have access to that contains a text file. Which share is it?]
 
-backup파일에 text 파일이 있는 것을 확인 할 수 있다
+The `backup` share contained a text file.
 
 ![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-정답: backup
+**Answer: backup**
 
 ### [What is the content of the file?]
 
-backup 결과에서 확인한 것처럼 파일의 내용은 YmFja3VwQHNwb29reXNlYy5sb2NhbDpiYWNrdXAyNTE3ODYw이다
-
-정답: YmFja3VwQHNwb29reXNlYy5sb2NhbDpiYWNrdXAyNTE3ODYw
+**Answer: YmFja3VwQHNwb29reXNlYy5sb2NhbDpiYWNrdXAyNTE3ODYw**
 
 ### [Decoding the contents of the file, what is the full contents?]
 
-backup 코드의 해쉬는 base64 타입으로 디코딩 하면 된다
+The content is Base64 — decode it:
 
 ```
 cat hash_1.txt | base64 -d
@@ -143,45 +134,41 @@ cat hash_1.txt | base64 -d
 
 ![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-
-정답: backup@spookysec.local:backup2517860
+**Answer: backup@spookysec.local:backup2517860**
 
 ### [What method allowed us to dump NTDS.DIT?]
 
-여기서 NTDS.DIT 는 쉽게 말해 도메인 컨트롤러의 핵심 데이터베이스 파일이다
+NTDS.DIT is the Domain Controller's core database — it holds everything.
 
-DCSync는 도메인 컨트롤러끼리 데이터를 동기화할 때 쓰는 정상적인 기능이지만 backup 계정이 DCSync 권한을 가지고 있어서 DC인 척 하고 모든 해시를 요청할 수 있게 된다
+DCSync is a legitimate DC-to-DC sync feature. Since the `backup` account holds DCSync privileges, it can impersonate a DC and request all hashes from the real one.
 
 ![8](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/8.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ![9](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80/9.Tryhackme%20%7C%20Attacktive%20Directory%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-※번외로 krbtgt를 이용해 golden ticket 공격도 가능
+The output confirms it: `[*] Using the DRSUAPI method to get NTDS.DIT secrets`.
 
-출력 결과 NTLM 해시 덤프가 성공한 것을 확인 할 수 있으며 ([*] Using the DRSUAPI method to get NTDS.DIT secrets) DRSUAPI 방법을 사용한 것을 알 수 있다
+> Side note: with the krbtgt hash you could also launch a Golden Ticket attack.
+> 
 
-정답: DRSUAPI
+**Answer: DRSUAPI**
 
 ### [What is the Administrators NTLM hash?]
 
-Administrator 해쉬중 NTLM 해쉬는 0e0363213e37b94221497260b0bcb4fc이다
+Dump format breakdown:
 
 ```
 Administrator:500:aad3b435b51404eeaad3b435b51404ee:0e0363213e37b94221497260b0bcb4fc:::
-              │   └─ LM hash                             └─ NTLM hash (중요)
+              │   └─ LM hash                             └─ NTLM hash (this one matters)
               └─ RID
 ```
 
-정답: 0e0363213e37b94221497260b0bcb4fc
+**Answer: 0e0363213e37b94221497260b0bcb4fc**
 
 ### [What method of attack could allow us to authenticate as the user without the password?]
 
-패스워드 없이 유저로 인증할 수 있게 해주는 공격 방법은 Pass the Hash 이다
-
-정답: Pass the Hash
+**Answer: Pass the Hash**
 
 ### [Using a tool called Evil-WinRM what option will allow us to use a hash?]
 
-Evil-WinRM에서 해시를 사용할 수 있게 해주는 옵션은 -H이다
-
-정답: -H
+**Answer: -H**
