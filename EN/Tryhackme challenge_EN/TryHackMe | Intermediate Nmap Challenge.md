@@ -1,10 +1,10 @@
-# Tryhackme | Intermediate Nmap Challenge
+tryhackme link → https://tryhackme.com/room/intermediatenmap
 
-Challenge link → https://tryhackme.com/room/intermediatenmap
+I worked through TryHackMe's Intermediate Nmap room.
 
-I worked through the TryHackMe Intermediate Nmap room. The overall flow involved running recon with Nmap, finding a hint from a custom service, connecting via SSH, and capturing the flag.
+The overall flow was: perform recon with Nmap, find a hint from a custom service, access via SSH, and capture the flag.
 
-First I kicked things off with the most fundamental step — a port scan.
+First, I ran a port scan — the most fundamental step in information gathering.
 
 ```
 sudo nmap -sS --min-rate 5000 -p- <IP>
@@ -12,37 +12,47 @@ sudo nmap -sS --min-rate 5000 -p- <IP>
 
 ![1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
+With all 3 ports confirmed open, I'll briefly explain what service is running on each port.
 
-With all three ports confirmed open, here's a quick rundown of what's running on each.
+First, port 31337 is a non-standard port.
 
-Port 31337 is a non-standard port. In CTF and security labs, it's common to find custom services on unusual ports that serve up hints or special information — so checking the highest port number first seemed like the most efficient approach.
+In CTF and security practice environments, it's common for custom services to run on non-standard ports like this, providing hints or special information.
+
+So I judged it most efficient to start with the highest port number.
 
 ```
 nc <IP> 31337
 ```
 
+![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
+
+I connected using netcat.
+
+nc (netcat) is a networking tool that can create TCP/UDP connections and send/receive data — it's well-suited for checking raw data since it can communicate directly with services without a web browser.
+
+Upon inspection, the custom service was outputting credentials in plaintext in the format user:password.
+
+I had a hunch this was the authentication info needed for SSH access.
+
+In CTF practice, hints are often provided intentionally like this.
+
+Next, I analyzed the SSH ports.
+
+Since both port 22 and port 2222 were open, I needed to figure out which port I could actually connect through.
+
+First, I checked the authentication method for each port.
+
+Port 22 is the standard SSH port and password authentication was available.
+
 ![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/3.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 ![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/4.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
-I connected using netcat. `nc` (netcat) is a networking tool that establishes TCP/UDP connections and lets you send and receive data — perfect for inspecting raw service responses without a browser.
+On the other hand, port 2222 is an alternate SSH port but only allowed public key authentication, so password authentication was not possible.
 
-The custom service turned out to be outputting credentials in plaintext as `user:password`. My gut said this was exactly what I'd need for SSH authentication. CTF labs often drop hints like this intentionally.
-
-Next, I looked at the SSH ports. Two were open — 22 and 2222 — so I needed to figure out which one would accept a login.
-
-First I checked the authentication method on each port.
-
-Port 22 (standard SSH) allowed password authentication.
+Since the credentials obtained from port 31337 were in password form, I needed to attempt connection on port 22.
 
 ![5](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/5.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
-
-Port 2222 (alternate SSH), on the other hand, only accepted public key authentication — password login was out.
-
-Since the credentials from port 31337 were a password, port 22 was the obvious choice.
-
-![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
 
 I connected to port 22 first.
 
@@ -50,11 +60,13 @@ I connected to port 22 first.
 ssh user@<IP> -p 22
 ```
 
+![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.png)
+
+I entered the password obtained from port 31337 and successfully logged in.
+
+After logging in, I checked my current location and found I was in /home/ubuntu, then navigated to the parent directory to explore files.
+
 ![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.Tryhackme%C2%A0%7C%20Intermediate%20Nmap%20%EC%B1%8C%EB%A6%B0%EC%A7%80.jpg)
-
-I entered the password from port 31337 and got in without a hitch.
-
-After logging in, I checked my location — `/home/ubuntu`. I moved up a level and browsed around.
 
 ```bash
 pwd
@@ -62,15 +74,17 @@ cd ..
 ls
 ```
 
-Two directories: `ubuntu` and `user`. Headed into `user`.
+There were two directories: ubuntu and user.
+
+I navigated into the user directory first to check the files.
 
 ```bash
 cd user
 ls
 ```
 
-Found `flag.txt`.
+I found the flag.txt file.
 
-```bash
+```css
 cat flag.txt
 ```
