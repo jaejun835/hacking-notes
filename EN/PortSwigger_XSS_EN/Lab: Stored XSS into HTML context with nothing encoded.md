@@ -1,5 +1,3 @@
-# Lab: Stored XSS into HTML context with nothing encoded
-
 ### [Problem]
 
 This lab contains a simple stored cross-site scripting vulnerability in the comment functionality.
