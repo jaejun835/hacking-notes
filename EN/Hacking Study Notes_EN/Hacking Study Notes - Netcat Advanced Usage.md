@@ -83,3 +83,5 @@ Quick note on why `/dev/` is used: `/dev/` is where device files live. Linux tre
 The result: all of bash's I/O is redirected over the network.
 
 The catch: this only works if bash's `/dev/tcp` support is enabled. Some distributions like Ubuntu disable it by default for security reasons.
+
+That covers netcat's basic usage and the workarounds for when the `-e` option isn't available.
