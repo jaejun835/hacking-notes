@@ -1,5 +1,3 @@
-# Lab: Reflected XSS into HTML context with nothing encoded
-
 ### [Problem]
 
 This lab contains a simple reflected cross-site scripting vulnerability in the search functionality.
