@@ -8,7 +8,7 @@ Today I'll walk through basic netcat usage with some hands-on practice.
 
 Netcat supports various connection modes, including a **bind shell** (attacker connects to target) and a **reverse shell** (target connects back to attacker).
 
-(For a basic explanation of shells: https://unknown08.tistory.com/36)
+(For a basic explanation of shells: https://github.com/jaejun835/hacking-notes/blob/main/EN/Hacking%20Study%20Notes_EN/%5B2025-11-02_20%3A46%5D%20Hacking%20Study%20Notes%20-%20About%20Shells.md)
 
 > Important: the order of commands differs between reverse shell and bind shell.
 > 

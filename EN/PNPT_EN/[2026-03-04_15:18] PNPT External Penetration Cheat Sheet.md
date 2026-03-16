@@ -6,7 +6,7 @@ Each step is organized to reflect the actual workflow used in both the exam and 
 
 External penetration testing involves executing real attacks based on intelligence gathered during OSINT.
 
-※ For OSINT details, refer to the dedicated post at https://unknown08.tistory.com/61
+※ For OSINT details, refer to the dedicated post at https://github.com/jaejun835/hacking-notes/blob/main/EN/PNPT_EN/%5B2026-03-03_19%3A06%5D%20PNPT%20OSINT%20Techniques%20Cheat%20Sheet.md
 
 ```bash
 [OSINT complete → email list, subdomains, leaked credentials secured]
