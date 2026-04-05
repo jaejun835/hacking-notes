@@ -227,7 +227,7 @@ Now that domain registration in /etc/hosts is complete, let's access thomaswreat
 
 **Screenshot:**
 
-(image)
+![1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/1.png)
 
 As a result of browser exploration, we confirmed publicly available information such as the target's address, phone number, and email.
 This information can be used in real penetration tests for social engineering or password guessing attacks.
@@ -235,7 +235,7 @@ Finally, let's search for a CVE based on the information gathered so far to gain
 
 **CVE:**
 
-(image)
+![2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/2.png)
 
 As a result of the search, we identified CVE-2019-15107.
 This vulnerability is an Unauthenticated RCE (Remote Code Execution) found in Webmin versions 1.890 ~ 1.920 with a CVSS score of 9.0 (Critical).
@@ -935,7 +935,7 @@ Next, let's access the web service on host 150 to check what service is running.
 ```
 **Result:**
 
-(image)
+![3](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/3.png)
 
 As a result of accessing http://10.200.180.150 in the browser, a Django 404 error page was displayed and DEBUG mode was enabled, exposing the internal URL structure.
 Having confirmed that the GitStack service is running, let's access http://10.200.180.150/gitstack to check the GitStack login page.
@@ -946,7 +946,7 @@ Having confirmed that the GitStack service is running, let's access http://10.20
 ```
 **Result:**
 
-(image)
+![4](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/4.png)
 
 As a result of accessing http://10.200.180.150/gitstack, we confirmed the GitStack login page.
 Default credentials (admin/admin) were exposed on the page, so we attempted to log in but failed.
@@ -1283,7 +1283,8 @@ lsadump::sam
 ```
 **Result:**
 
-(image)
+![5](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/5.png)
+
 ```bash
 Windows PowerShell
 Copyright (C) Microsoft Corporation. All rights reserved.
@@ -1505,7 +1506,7 @@ RedirectListener : Webserver
 ```
 **Result:**
 
-(image)
+![6](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/6.png)
 
 Listener creation was successful.
 When the http_hop listener is created, hop files are automatically generated in the /tmp/http_hop/ directory.
@@ -1534,7 +1535,7 @@ Language  : powershell
 ```
 **Result:**
 
-(image)
+![7](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/Tryhackme%20challenge_KR/Tryhackme%20%7C%20Wreath%20%EC%B1%8C%EB%A6%B0%EC%A7%80/7.png)
 
 Stager creation was successful.
 After creating the stager, click Actions → Copy to Clipboard to copy the payload.
