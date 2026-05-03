@@ -12,6 +12,8 @@ KubSTU CTF is an online CTF hosted by Kuban State Technological University in Ru
 The quality of the challenges was better than I expected, and they did a good job of reflecting real-world vulnerabilities.
 However, the OSINT challenges were a bit tough since many of them required knowledge specific to Russia.
 In the end, competing solo out of 810 participating teams, I finished **305th overall** and **177th in the Students division**.
+![image1](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/CTF/KubSTU%20CTF%20%EC%B0%B8%EA%B0%80%20%ED%9B%84%EA%B8%B0/image%20(1).png)
+![image2](https://raw.githubusercontent.com/jaejun835/hacking-notes/main/Photo/CTF/KubSTU%20CTF%20%EC%B0%B8%EA%B0%80%20%ED%9B%84%EA%B8%B0/image%20(2).png)
 
 ## Conclusion
 
